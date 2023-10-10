@@ -188,34 +188,31 @@
   </tr>
 </thead>
 <tbody>
-    <tr v-for="(item, index) in displayedItems" :key="index" v-b-toggle.sidebar-1>
+    <tr v-for="(item, index) in visibleItems" :key="index" @click="showDetails(item)">
       <th class="name_sect2" scope="row"><input class="inptchck_user" type="checkbox">
-      <img class="tble_img" src="/dashboard/prof_pic_dashbrd.png" alt=""><p class="text-primary">{{item.name}}</p>
+      <img class="tble_img" :src="item.image" alt=""><p class="text-primary">{{item.name}}</p>
       </th>
       <td class="tble_txt2">{{item.email}}</td>
     <td class="tble_txt2">{{item.phone}}</td>
-    <td class="tble_txt2">{{item.plan}}</td>
-    <td class="tble_txt2">{{item.date}}</td>
+    <td class="tble_txt2">{{ planNames[index] }}</td>
+    <td class="tble_txt2">{{item.date_joined}}</td>
   </tr>            
 </tbody>
+
 </table>
+      <div class="custom-pagination">
+        <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">Previous</button>
+        <span>{{ currentPage }}</span>
+        <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages">Next</button>
       </div>
-      <div>
-        <b-pagination 
-        v-model="currentPage" 
-        :total-rows="totalRows" 
-        :per-page="perPage"  
-        @change="onPageChange" 
-        size="sm" 
-        align="center">
-        </b-pagination>
-      </div>
-      <b-sidebar  id="sidebar-1" right shadow>
-   <div class="px-3 py-2">
+</div>
+     
+      <b-sidebar v-model="sidebarVisible"   id="sidebar-1" right shadow>
+   <div class="px-3 py-2"  v-if="selectedItem">
     <div class="profl_sect">
-        <img class="modal_img" src="/dashboard/prof_pic_dashbrd.png" alt=""> 
-        <h2 style="font-weight: 800px; font-size: 18px; color: black;">Laura Norda (sample) <br>
-            <h6>Sales executive</h6> 
+        <img class="modal_img" :src="selectedItem.image" alt=""> 
+        <h2 style="font-weight: 800px; font-size: 18px; color: black;">{{selectedItem.name}}<br>
+            <h6>{{selectedItem.email}}</h6> 
         </h2>
         <div class="dtl_btn_top">
             <button class="tabl_btn"><svg class="svg-md mg-r-5 custom-button-svg" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 0H0v14h14V0z" fill="#fff" fill-opacity=".01"></path><path d="M7.696 6.304l2.803-2.803M6.567 10.5H3.5V7.433M7.433 3.5H10.5v3.067M10.5 3.5l-7 7" stroke="#333" stroke-linecap="round" stroke-linejoin="round"></path><rect x=".5" y=".5" width="13" height="13" rx="2" stroke="#333" stroke-linecap="round" stroke-linejoin="round"></rect></svg>
@@ -257,7 +254,7 @@
     <br>
   <div class="table-responsive_plan">
     <table class="table">
-  <tr>
+  <tr >
     <td class="text-info">Plan</td>
     <td class="text-info">--</td>
     <td class="text-info">Basic</td>
@@ -272,9 +269,9 @@
     <td class="text-info">--</td>
     <td class="text-info">23/4/25</td>
   </tr>
-</table>
-  </div> 
-    <hr>
+</table >
+  </div > 
+    <hr >
     <div>
         <div class="txt_main_one">
             <h5>Lead History (Download)</h5>
@@ -517,100 +514,50 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
-    data() {
-      return {
-        current_btn: 'btn0',
-        rows: 100,
-        currentPage: 1,
-        perPage: 5,
-        TableData:[
-        {   name: 'Laura Norda (sample)',
-            email: 'lauranordasample@gmail.com', 
-            phone: '4167348672', 
-            plan: 'Basic',
-            date: '26/5/25',
-        },
-        {   name: 'Laura Norda (sample)',
-            email: 'lauranordasample@gmail.com', 
-            phone: '4167348672', 
-            plan: 'Basic',
-            date: '26/5/25',
-        },
-        {   name: 'Laura Norda (sample)',
-            email: 'lauranordasample@gmail.com', 
-            phone: '4167348672', 
-            plan: 'Basic',
-            date: '26/5/25',
-        },
-        {   name: 'Laura Norda (sample)',
-            email: 'lauranordasample@gmail.com', 
-            phone: '4167348672', 
-            plan: 'Basic',
-            date: '26/5/25',
-        },
-        {   name: 'Laura Norda (sample)',
-            email: 'lauranordasample@gmail.com', 
-            phone: '4167348672', 
-            plan: 'Basic',
-            date: '26/5/25',
-        },
-        {   name: 'Laura Norda (sample)',
-            email: 'lauranordasample@gmail.com', 
-            phone: '4167348672', 
-            plan: 'Basic',
-            date: '26/5/25',
-        },
-        {   name: 'Laura Norda (sample)',
-            email: 'lauranordasample@gmail.com', 
-            phone: '4167348672', 
-            plan: 'Basic',
-            date: '26/5/25',
-        },
-        {   name: 'Laura Norda (sample)',
-            email: 'lauranordasample@gmail.com', 
-            phone: '4167348672', 
-            plan: 'Basic',
-            date: '26/5/25',
-        },
-        {   name: 'Laura Norda (sample)',
-            email: 'lauranordasample@gmail.com', 
-            phone: '4167348672', 
-            plan: 'Basic',
-            date: '26/5/25',
-        },
-        {   name: 'Laura Norda (sample)',
-            email: 'lauranordasample@gmail.com', 
-            phone: '4167348672', 
-            plan: 'Basic',
-            date: '26/5/25',
-        },
-        {   name: 'Laura Norda (sample)',
-            email: 'lauranordasample@gmail.com', 
-            phone: '4167348672', 
-            plan: 'Basic',
-            date: '26/5/25',
-        },
-        {   name: 'Laura Norda (sample)',
-            email: 'lauranordasample@gmail.com', 
-            phone: '4167348672', 
-            plan: 'Basic',
-            date: '26/5/25',
-        },
-      ]
-      }
-    },
-    computed: {
+  data() {
+    return {
+      current_btn: 'btn0',
+      // rows: 100,
+      currentPage: 1,
+      perPage: 20,
+      displayedItems: [],
+      sidebarVisible: false,
+      selectedItem: null,
+      TableData: [],
+      totalPages: 8000,
+    };
+  },
+  computed: {
     totalRows() {
-    return this.TableData.length; 
+      return this.TableData.length;
     },
-    displayedItems() {
+     visibleItems() {
       const startIndex = (this.currentPage - 1) * this.perPage;
       const endIndex = startIndex + this.perPage;
       return this.TableData.slice(startIndex, endIndex);
     },
+    planNames() {
+      return this.visibleItems.map((item) => {
+        if (Array.isArray(item.plans) && item.plans.length > 0) {
+          return item.plans[0].name;
+        }
+        return '';
+      });
+    },
   },
   methods: {
+    async fetchDataFromApi(pageNumber) {
+  try {
+    const url = `https://api.leadfinder.live/users/users/?page=${pageNumber}`;
+    const response = await axios.get(url);
+    this.TableData = this.TableData.concat(response.data.results);
+    this.totalPages = Math.ceil(response.data.count / this.perPage);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+},
     toggleSidebar() {
       this.$refs.mySidebar.toggle();
     },
@@ -618,11 +565,31 @@ export default {
       this.current_btn = btn;
     },
     onPageChange(newPage) {
-      this.currentPage = newPage;
+      if (newPage >= 1 && newPage <= this.totalPages) {
+        this.currentPage = newPage;
+        this.fetchDataFromApi(newPage);
+      }
+    },
+    showDetails(item) {
+      this.selectedItem = item;
+      this.sidebarVisible = true;
+    },
+    goToPage(page) {
+  if (page >= 1 && page <= this.totalPages) {
+    this.currentPage = page;
+    this.fetchDataFromApi(page); 
+  }
+}
   },
+  created() {
+    this.fetchDataFromApi(this.currentPage);
   },
 };
 </script>
+
+
+
+
 
 <style>
 @import './style/usersstyle.css';

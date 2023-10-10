@@ -740,7 +740,7 @@ width: 50px;
 .inptchck_main{
 height: 20px;
 width: 50px;
-margin-left: -60px;
+margin-left: -90px;
 }
 .inptchck_user{
 height: 20px;
@@ -807,7 +807,7 @@ th.name_sect {
 th.name_sect2 {
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: space-between;
     cursor: pointer;
 }
 }
@@ -1139,3 +1139,45 @@ gap: 68px;
         cursor: pointer;
     }
     }
+
+    .custom-pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+      }
+      
+      .pagination-button {
+        padding: 5px 10px;
+        margin: 0 5px;
+        cursor: pointer;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+      }
+      
+      .pagination-button:hover {
+        background-color: #0056b3;
+      }
+      
+      .pagination-button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+      
+      .pagination-list {
+        list-style: none;
+        display: flex;
+        margin: 0;
+        padding: 0;
+      }
+      
+      .pagination-list li {
+        margin: 0;
+        padding: 0;
+      }
+      
+      .pagination-list li.active button {
+        background-color: #0056b3;
+      }

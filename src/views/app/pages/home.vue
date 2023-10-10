@@ -194,7 +194,7 @@
   </tr>
 </thead>
 <tbody>
-  <tr v-for="(item, index) in displayedItems" :key="index" v-b-toggle.sidebar-1>
+  <tr v-for="(item, index) in visibleItems" :key="index" @click="showDetails(item)"    >
       <th class="name_sect " scope="row"><input class="inptchck" type="checkbox">
       <img class="tble_img v-b-modal.modal-scrollable" :src="item.image" alt=""><p class="text-primary ">{{item.name}}</p>
       </th>
@@ -228,12 +228,12 @@
       </div>
       <br><br>
 
-      <b-sidebar  id="sidebar-1" right shadow>
-   <div class="px-3 py-2">
+      <b-sidebar v-model="sidebarVisible"  id="sidebar-1" right shadow >
+   <div class="px-3 py-2" v-if="selectedItem">
     <div class="profl_sect">
-        <img class="modal_img" src="/dashboard/prof_pic_dashbrd.png" alt=""> 
-        <h2 style="font-weight: 800px; font-size: 18px; color: black;">Laura Norda (sample) <br>
-            <h6>Sales executive</h6> 
+        <img class="modal_img" :src="selectedItem.image" alt=""> 
+        <h2 style="font-weight: 800px; font-size: 18px; color: black;">{{ selectedItem.name }}<br>
+            <h6>{{ selectedItem.email }}</h6> 
         </h2>
         <div class="dtl_btn_top">
             <button class="tabl_btn"><svg class="svg-md mg-r-5 custom-button-svg" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 0H0v14h14V0z" fill="#fff" fill-opacity=".01"></path><path d="M7.696 6.304l2.803-2.803M6.567 10.5H3.5V7.433M7.433 3.5H10.5v3.067M10.5 3.5l-7 7" stroke="#333" stroke-linecap="round" stroke-linejoin="round"></path><rect x=".5" y=".5" width="13" height="13" rx="2" stroke="#333" stroke-linecap="round" stroke-linejoin="round"></rect></svg>
@@ -378,7 +378,9 @@ export default {
         current_btn: 'btn0',
         perPage: 5, 
         currentPage: 1,
-
+        displayedItems: [],
+        sidebarVisible: false,
+        selectedItem: null,
         TableData:[
             
         {   name: 'Laura Norda ',
@@ -498,7 +500,7 @@ export default {
     totalRows() {
     return this.TableData.length; 
     },
-    displayedItems() {
+    visibleItems() {
       const startIndex = (this.currentPage - 1) * this.perPage;
       const endIndex = startIndex + this.perPage;
       return this.TableData.slice(startIndex, endIndex);
@@ -514,6 +516,11 @@ export default {
     onPageChange(newPage) {
       this.currentPage = newPage;
   },
+  showDetails(item) {
+    this.selectedItem = item;
+    this.sidebarVisible = true;
+  }
+
   }
 };
 </script>

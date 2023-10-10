@@ -10,6 +10,7 @@
   "dependencies": {
     "@johmun/vue-tags-input": "^2.1.0",
     "apexcharts": "^3.29.0",
+    "axios": "^1.5.1",
     "babel-polyfill": "^6.26.0",
     "bootstrap": "^4.4.1",
     "bootstrap-vue": "^2.10.1",
@@ -56,6 +57,7 @@
     "vue2-editor": "^2.10.2",
     "vue3-datepicker": "^0.2.5",
     "vuedraggable": "^2.23.2",
+    "vuejs-paginate": "^2.1.0",
     "vuejs-smart-table": "0.0.5",
     "vuelidate": "^0.7.5",
     "vuetable-2": "^1.7.5",
