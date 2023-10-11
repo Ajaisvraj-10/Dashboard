@@ -200,11 +200,12 @@
 </tbody>
 
 </table>
-      <div class="custom-pagination">
-        <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">Previous</button>
-        <span>{{ currentPage }}</span>
-        <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages">Next</button>
-      </div>
+<div class="custom-pagination">
+  <button class="pagination-button" @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">Previous</button>
+  <span>{{ currentPage }}</span>
+  <button class="pagination-button" @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages">Next</button>
+</div>
+
 </div>
      
       <b-sidebar v-model="sidebarVisible"   id="sidebar-1" right shadow>
@@ -254,21 +255,21 @@
     <br>
   <div class="table-responsive_plan">
     <table class="table">
-  <tr >
-    <td class="text-info">Plan</td>
-    <td class="text-info">--</td>
-    <td class="text-info">Basic</td>
-  </tr>
+      <thead>
+        <tr>
+          <th class="text-info">Plan</th>
+          <th class="text-info">Price</th>
+          <th class="text-info">Exp-Date</th>
+        </tr>
+      </thead>
+      <tbody>
   <tr>
-    <td class="text-info">Price</td>
-    <td class="text-info">--</td>
-    <td class="text-info">$99</td>
+    <td class="text-info">{{ planDetailsData.length > 0 ? planDetailsData[0].plans[0].name : 'N/A' }}</td>
+    <td class="text-info">{{ planDetailsData.length > 0 ? planDetailsData[0].plans[0].amount : 'N/A' }}</td>
+    <td class="text-info">{{ planDetailsData.length > 0 ? planDetailsData[0].plans[0].date : 'N/A' }}</td>
   </tr>
-  <tr>
-    <td class="text-info">Exp-Date</td>
-    <td class="text-info">--</td>
-    <td class="text-info">23/4/25</td>
-  </tr>
+</tbody>
+
 </table >
   </div > 
     <hr >
@@ -290,68 +291,99 @@
   </tr>
 </thead>
 <tbody>
-    <tr v-b-toggle.sidebar-1>
-      <th class="name_sect" scope="row">
-        <p class="text-primary">Laura Norda (sample)</p>
-      </th>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
+  <tr v-b-toggle.sidebar-1 v-if="parsedDownloadLeadsData">
+  <th class="name_sect" scope="row">
+    <p class="text-primary">{{ userSpecificData.user.name }}</p>
+  </th>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].location }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].radius }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].estimate }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].leads }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].is_stop }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].created_on }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+</tr>
 
-  </tr> 
-  <tr v-b-toggle.sidebar-1>
-      <th class="name_sect" scope="row">
-        <p class="text-primary">Laura Norda (sample)</p>
-      </th>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
 
-  </tr> 
-  <tr v-b-toggle.sidebar-1>
-      <th class="name_sect" scope="row">
-        <p class="text-primary">Laura Norda (sample)</p>
-      </th>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
+<tr v-b-toggle.sidebar-1 v-if="parsedDownloadLeadsData">
+  <th class="name_sect" scope="row">
+    <p class="text-primary">{{ userSpecificData.user.name }}</p>
+  </th>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].location }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].radius }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].estimate }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].leads }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].is_stop }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].created_on }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+</tr>
 
-  </tr> 
 
-  <tr v-b-toggle.sidebar-1>
-      <th class="name_sect" scope="row">
-        <p class="text-primary">Laura Norda (sample)</p>
-      </th>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
+<tr v-b-toggle.sidebar-1 v-if="parsedDownloadLeadsData">
+  <th class="name_sect" scope="row">
+    <p class="text-primary">{{ userSpecificData.user.name }}</p>
+  </th>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].location }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].radius }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].estimate }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].leads }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].is_stop }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].created_on }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+</tr>
 
-  </tr> 
 
-  <tr v-b-toggle.sidebar-1>
-      <th class="name_sect" scope="row">
-        <p class="text-primary">Laura Norda (sample)</p>
-      </th>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
+<tr v-b-toggle.sidebar-1 v-if="parsedDownloadLeadsData">
+  <th class="name_sect" scope="row">
+    <p class="text-primary">{{ userSpecificData.user.name }}</p>
+  </th>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].location }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].radius }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].estimate }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].leads }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].is_stop }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].created_on }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+</tr>
 
-  </tr>         
+<tr v-b-toggle.sidebar-1 v-if="parsedDownloadLeadsData">
+  <th class="name_sect" scope="row">
+    <p class="text-primary">{{ userSpecificData.user.name }}</p>
+  </th>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].location }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].radius }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].estimate }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].leads }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].is_stop }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].created_on }}</td>
+  <td class="tble_txt" v-else>N/A</td>
+</tr>
+         
 </tbody>
 </table>
       </div>
@@ -375,68 +407,157 @@
   </tr>
 </thead>
 <tbody>
-    <tr v-b-toggle.sidebar-1>
-      <th class="name_sect" scope="row">
-        <p class="text-primary">Laura Norda (sample)</p>
-      </th>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
+  <tr v-b-toggle.sidebar-1 v-if="userSpecificData">
+  <th class="name_sect" scope="row">
+    <p class="text-primary">{{ userSpecificData.user.name }}</p>
+  </th>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].location }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].radius }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].estimate }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.plan_history[0] && userSpecificData.plan_history[0].plan_details">{{ userSpecificData.plan_history[0].plan_details.leads }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].is_stop }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.plan_history[0]">{{ userSpecificData.plan_history[0].date }}</span>
+    <span v-else>---</span>
+  </td>
+</tr>
 
-  </tr> 
-  <tr v-b-toggle.sidebar-1>
-      <th class="name_sect" scope="row">
-        <p class="text-primary">Laura Norda (sample)</p>
-      </th>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
+<tr v-b-toggle.sidebar-1 v-if="userSpecificData">
+  <th class="name_sect" scope="row">
+    <p class="text-primary">{{ userSpecificData.user.name }}</p>
+  </th>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].location }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].radius }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].estimate }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.plan_history[0] && userSpecificData.plan_history[0].plan_details">{{ userSpecificData.plan_history[0].plan_details.leads }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].is_stop }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.plan_history[0]">{{ userSpecificData.plan_history[0].date }}</span>
+    <span v-else>---</span>
+  </td>
+</tr>
+ 
+<tr v-b-toggle.sidebar-1 v-if="userSpecificData">
+  <th class="name_sect" scope="row">
+    <p class="text-primary">{{ userSpecificData.user.name }}</p>
+  </th>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].location }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].radius }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].estimate }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.plan_history[0] && userSpecificData.plan_history[0].plan_details">{{ userSpecificData.plan_history[0].plan_details.leads }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].is_stop }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.plan_history[0]">{{ userSpecificData.plan_history[0].date }}</span>
+    <span v-else>---</span>
+  </td>
+</tr>
 
-  </tr> 
-  <tr v-b-toggle.sidebar-1>
-      <th class="name_sect" scope="row">
-        <p class="text-primary">Laura Norda (sample)</p>
-      </th>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
+<tr v-b-toggle.sidebar-1 v-if="userSpecificData">
+  <th class="name_sect" scope="row">
+    <p class="text-primary">{{ userSpecificData.user.name }}</p>
+  </th>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].location }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].radius }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].estimate }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.plan_history[0] && userSpecificData.plan_history[0].plan_details">{{ userSpecificData.plan_history[0].plan_details.leads }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].is_stop }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.plan_history[0]">{{ userSpecificData.plan_history[0].date }}</span>
+    <span v-else>---</span>
+  </td>
+</tr>
 
-  </tr> 
 
-  <tr v-b-toggle.sidebar-1>
-      <th class="name_sect" scope="row">
-        <p class="text-primary">Laura Norda (sample)</p>
-      </th>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-
-  </tr> 
-
-  <tr v-b-toggle.sidebar-1>
-      <th class="name_sect" scope="row">
-        <p class="text-primary">Laura Norda (sample)</p>
-      </th>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-    <td class="tble_txt"></td>
-
-  </tr>         
+ <tr v-b-toggle.sidebar-1 v-if="userSpecificData">
+  <th class="name_sect" scope="row">
+    <p class="text-primary">{{ userSpecificData.user.name }}</p>
+  </th>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].location }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].radius }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].estimate }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.plan_history[0] && userSpecificData.plan_history[0].plan_details">{{ userSpecificData.plan_history[0].plan_details.leads }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].is_stop }}</span>
+    <span v-else>---</span>
+  </td>
+  <td class="tble_txt">
+    <span v-if="userSpecificData.plan_history[0]">{{ userSpecificData.plan_history[0].date }}</span>
+    <span v-else>---</span>
+  </td>
+</tr>
+       
 </tbody>
 </table>
       </div>
@@ -515,11 +636,11 @@
 
 <script>
 import axios from 'axios';
+
 export default {
   data() {
     return {
       current_btn: 'btn0',
-      // rows: 100,
       currentPage: 1,
       perPage: 20,
       displayedItems: [],
@@ -527,13 +648,18 @@ export default {
       selectedItem: null,
       TableData: [],
       totalPages: 8000,
+      selectedUserId: null,
+      userSpecificData: {},
+      parsedDownloadLeadsData: null,
+      planDetailsData: [], 
+      planNames: [],
     };
   },
   computed: {
     totalRows() {
       return this.TableData.length;
     },
-     visibleItems() {
+    visibleItems() {
       const startIndex = (this.currentPage - 1) * this.perPage;
       const endIndex = startIndex + this.perPage;
       return this.TableData.slice(startIndex, endIndex);
@@ -549,15 +675,54 @@ export default {
   },
   methods: {
     async fetchDataFromApi(pageNumber) {
+      try {
+        const url = `https://api.leadfinder.live/users/users/?page=${pageNumber}`;
+        const response = await axios.get(url);
+        this.TableData = this.TableData.concat(response.data.results);
+        this.totalPages = Math.ceil(response.data.count / this.perPage);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    },
+    async fetchUserSpecificData() {
+      try {
+        if (this.selectedUserId) {
+          const url = `https://api.leadfinder.live/employee/user_info/${this.selectedUserId}/`;
+          const response = await axios.get(url);
+          this.userSpecificData = response.data;
+          // console.log('User Specific Data:', this.userSpecificData);
+        }
+      } catch (error) {
+        console.error('Error fetching user-specific data:', error);
+      }
+    },
+    async fetchPlanDetails(pageNumber) {
   try {
     const url = `https://api.leadfinder.live/users/users/?page=${pageNumber}`;
     const response = await axios.get(url);
-    this.TableData = this.TableData.concat(response.data.results);
-    this.totalPages = Math.ceil(response.data.count / this.perPage);
+    
+    // Extract the plan names and store them in a separate array
+    this.planDetailsData = response.data.results;
+    this.planNames = this.planDetailsData.map((user) => {
+      return user.plans[0].name; // Assuming each user has a single plan
+    });
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error('Error fetching Plan Details data:', error);
   }
 },
+
+
+
+    parseDownloadLeadsData() {
+    if (this.userSpecificData.download_leads.length) {
+      const rawData = this.userSpecificData.download_leads[0].data;
+      try {
+        this.parsedDownloadLeadsData = JSON.parse(rawData);
+      } catch (error) {
+        console.error('Error parsing download leads data:', error);
+      }
+    }
+  },
     toggleSidebar() {
       this.$refs.mySidebar.toggle();
     },
@@ -573,19 +738,35 @@ export default {
     showDetails(item) {
       this.selectedItem = item;
       this.sidebarVisible = true;
+      this.selectedUserId = item.id;
+
+      this.$nextTick(async () => {
+        await this.fetchUserSpecificData();
+      });
     },
     goToPage(page) {
-  if (page >= 1 && page <= this.totalPages) {
-    this.currentPage = page;
-    this.fetchDataFromApi(page); 
-  }
-}
+      if (page >= 1 && page <= this.totalPages) {
+        this.currentPage = page;
+        this.fetchDataFromApi(page);
+      }
+    },
   },
   created() {
     this.fetchDataFromApi(this.currentPage);
+    this.fetchPlanDetails(1);
   },
+  watch: {
+  sidebarVisible(newVal) {
+    if (newVal) {
+      this.fetchUserSpecificData();
+      this.parseDownloadLeadsData(); 
+    }
+  },
+},
+
 };
 </script>
+
 
 
 
