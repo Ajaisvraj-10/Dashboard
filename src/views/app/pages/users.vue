@@ -190,7 +190,7 @@
 <tbody>
     <tr v-for="(item, index) in visibleItems" :key="index" @click="showDetails(item)">
       <th class="name_sect2" scope="row"><input class="inptchck_user" type="checkbox">
-      <img class="tble_img" :src="item.image" alt=""><p class="text-primary">{{item.name}}</p>
+      <img class="tble_img" :src="item.image || '/dashboard/prof_pic_dashbrd.png'" alt=""><p class="text-primary">{{item.name}}</p>
       </th>
       <td class="tble_txt2">{{item.email}}</td>
     <td class="tble_txt2">{{item.phone}}</td>
@@ -201,17 +201,26 @@
 
 </table>
 <div class="custom-pagination">
-  <button class="pagination-button" @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">Previous</button>
-  <span>{{ currentPage }}</span>
-  <button class="pagination-button" @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages">Next</button>
+  <button class="pagination-button" @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">&laquo;</button>
+  <button
+    v-for="page in visiblePages"
+    :key="page"
+    @click="goToPage(page)"
+    :class="{ active: currentPage === page }"
+    class="pagination-button"
+  >{{ page }}</button>
+  <button class="pagination-button" @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages">&raquo;</button>
 </div>
+
+
+
 
 </div>
      
       <b-sidebar v-model="sidebarVisible"   id="sidebar-1" right shadow>
    <div class="px-3 py-2"  v-if="selectedItem">
     <div class="profl_sect">
-        <img class="modal_img" :src="selectedItem.image" alt=""> 
+      <img class="modal_img" :src="selectedItem.image || '/dashboard/prof_pic_dashbrd.png'" alt="">
         <h2 style="font-weight: 800px; font-size: 18px; color: black;">{{selectedItem.name}}<br>
             <h6>{{selectedItem.email}}</h6> 
         </h2>
@@ -278,115 +287,34 @@
             <h5>Lead History (Download)</h5>
         </div>
         <div class="table-responsive2">
-          <table class="table2  table-hover table-bordered table-responsive">
-<thead>
-  <tr>
-    <th class="tble_name_sect2" scope="col">  Name </th>
-    <th class="tble_txt3" scope="col">Location </th>
-    <th class="tble_name_sect2" scope="col">Radius</th>
-    <th class="tble_txt3" scope="col">Estimation </th>
-    <th class="tble_txt3" scope="col">Leads </th>
-    <th class="tble_txt3" scope="col">Is Stoped </th>
-    <th class="tble_txt3" scope="col">Date & Time </th>
-  </tr>
-</thead>
-<tbody>
-  <tr v-b-toggle.sidebar-1 v-if="parsedDownloadLeadsData">
-  <th class="name_sect" scope="row">
-    <p class="text-primary">{{ userSpecificData.user.name }}</p>
-  </th>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].location }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].radius }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].estimate }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].leads }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].is_stop }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].created_on }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-</tr>
+    <table class="table2 table-hover table-bordered table-responsive">
+      <thead>
+        <tr>
+          <th class="tble_name_sect2" scope="col">Name</th>
+          <th class="tble_txt3" scope="col">Location</th>
+          <th class="tble_name_sect2" scope="col">Radius</th>
+          <th class="tble_txt3" scope="col">Estimation</th>
+          <th class="tble_txt3" scope="col">Leads</th>
+          <th class="tble_txt3" scope="col">Is Stopped</th>
+          <th class="tble_txt3" scope="col">Date & Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(downloadLead, index) in userSpecificData.download_leads" :key="index">
+          <th class="name_sect" scope="row">
+            <p class="text-primary">{{ userSpecificData.user.name }}</p>
+          </th>
+          <td class="tble_txt2">{{ parseData(downloadLead.data).location || 'N/A' }}</td>
+          <td class="tble_txt2">{{ parseData(downloadLead.data).radius || 'N/A' }}</td>
+          <td class="tble_txt2">{{ parseData(downloadLead.data).estimate || 'N/A' }}</td>
+          <td class="tble_txt2">{{ downloadLead.leads !== undefined ? downloadLead.leads : 'N/A' }}</td>
+          <td class="tble_txt2">{{ parseData(downloadLead.data).is_stop !== undefined ? parseData(downloadLead.data).is_stop : 'N/A' }}</td>
+          <td class="tble_txt2">{{ downloadLead.created_on || 'N/A' }}</td>
+        </tr>
+   </tbody>
+    </table>
+  </div>
 
-
-<tr v-b-toggle.sidebar-1 v-if="parsedDownloadLeadsData">
-  <th class="name_sect" scope="row">
-    <p class="text-primary">{{ userSpecificData.user.name }}</p>
-  </th>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].location }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].radius }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].estimate }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].leads }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].is_stop }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].created_on }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-</tr>
-
-
-<tr v-b-toggle.sidebar-1 v-if="parsedDownloadLeadsData">
-  <th class="name_sect" scope="row">
-    <p class="text-primary">{{ userSpecificData.user.name }}</p>
-  </th>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].location }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].radius }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].estimate }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].leads }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].is_stop }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].created_on }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-</tr>
-
-
-<tr v-b-toggle.sidebar-1 v-if="parsedDownloadLeadsData">
-  <th class="name_sect" scope="row">
-    <p class="text-primary">{{ userSpecificData.user.name }}</p>
-  </th>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].location }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].radius }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].estimate }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].leads }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].is_stop }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].created_on }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-</tr>
-
-<tr v-b-toggle.sidebar-1 v-if="parsedDownloadLeadsData">
-  <th class="name_sect" scope="row">
-    <p class="text-primary">{{ userSpecificData.user.name }}</p>
-  </th>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].location }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].radius }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].estimate }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].leads }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="parsedDownloadLeadsData[0]">{{ parsedDownloadLeadsData[0].is_stop }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-  <td class="tble_txt" v-if="userSpecificData.download_leads[0]">{{ userSpecificData.download_leads[0].created_on }}</td>
-  <td class="tble_txt" v-else>N/A</td>
-</tr>
-         
-</tbody>
-</table>
-      </div>
     </div>
 
     <div>
@@ -394,173 +322,41 @@
             <h5>Lead History (Tap)</h5>
         </div>
         <div class="table-responsive2">
-          <table class="table2  table-hover table-bordered table-responsive">
-<thead>
-  <tr>
-    <th class="tble_name_sect2" scope="col">  Name </th>
-    <th class="tble_txt3" scope="col">Location </th>
-    <th class="tble_name_sect2" scope="col">Radius</th>
-    <th class="tble_txt3" scope="col">Estimation </th>
-    <th class="tble_txt3" scope="col">Leads </th>
-    <th class="tble_txt3" scope="col">Is Stoped </th>
-    <th class="tble_txt3" scope="col">Date & Time </th>
-  </tr>
-</thead>
-<tbody>
-  <tr v-b-toggle.sidebar-1 v-if="userSpecificData">
+    <table class="table2 table-hover table-bordered table-responsive">
+      <thead>
+        <tr>
+          <th class="tble_name_sect2" scope="col">Name</th>
+          <th class="tble_txt3" scope="col">Location</th>
+          <th class="tble_name_sect2" scope="col">Radius</th>
+          <th class="tble_txt3" scope="col">Estimation</th>
+          <th class="tble_txt3" scope="col">Leads</th>
+          <th class="tble_txt3" scope="col">Is Stopped</th>
+          <th class="tble_txt3" scope="col">Date & Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-if="userSpecificData">
+  <th class="name_sect" scope="row">
+    <!-- <p class="text-primary">{{ userSpecificData.user.name }}</p> -->
+  </th>
+</tr>
+<tr v-for="(lead, index) in userSpecificData.lead_history" :key="index">
   <th class="name_sect" scope="row">
     <p class="text-primary">{{ userSpecificData.user.name }}</p>
   </th>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].location }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].radius }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].estimate }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.plan_history[0] && userSpecificData.plan_history[0].plan_details">{{ userSpecificData.plan_history[0].plan_details.leads }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].is_stop }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.plan_history[0]">{{ userSpecificData.plan_history[0].date }}</span>
-    <span v-else>---</span>
-  </td>
+  <td class="tble_txt2">{{ lead.location || '---' }}</td>
+  <td class="tble_txt2">{{ lead.radius || '---' }}</td>
+  <td class="tble_txt2">{{ lead.estimate || '---' }}</td>
+  <td class="tble_txt2">{{ lead.leads !== undefined ? lead.leads : 'N/A' }}</td>
+  <td class="tble_txt2">{{ lead.is_stop || '---' }}</td>
+  <td class="tble_txt2">{{ lead.created_on || '---' }}</td>
 </tr>
 
-<tr v-b-toggle.sidebar-1 v-if="userSpecificData">
-  <th class="name_sect" scope="row">
-    <p class="text-primary">{{ userSpecificData.user.name }}</p>
-  </th>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].location }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].radius }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].estimate }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.plan_history[0] && userSpecificData.plan_history[0].plan_details">{{ userSpecificData.plan_history[0].plan_details.leads }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].is_stop }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.plan_history[0]">{{ userSpecificData.plan_history[0].date }}</span>
-    <span v-else>---</span>
-  </td>
-</tr>
- 
-<tr v-b-toggle.sidebar-1 v-if="userSpecificData">
-  <th class="name_sect" scope="row">
-    <p class="text-primary">{{ userSpecificData.user.name }}</p>
-  </th>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].location }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].radius }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].estimate }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.plan_history[0] && userSpecificData.plan_history[0].plan_details">{{ userSpecificData.plan_history[0].plan_details.leads }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].is_stop }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.plan_history[0]">{{ userSpecificData.plan_history[0].date }}</span>
-    <span v-else>---</span>
-  </td>
-</tr>
+      </tbody>
+    </table>
+  </div>
 
-<tr v-b-toggle.sidebar-1 v-if="userSpecificData">
-  <th class="name_sect" scope="row">
-    <p class="text-primary">{{ userSpecificData.user.name }}</p>
-  </th>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].location }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].radius }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].estimate }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.plan_history[0] && userSpecificData.plan_history[0].plan_details">{{ userSpecificData.plan_history[0].plan_details.leads }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].is_stop }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.plan_history[0]">{{ userSpecificData.plan_history[0].date }}</span>
-    <span v-else>---</span>
-  </td>
-</tr>
-
-
- <tr v-b-toggle.sidebar-1 v-if="userSpecificData">
-  <th class="name_sect" scope="row">
-    <p class="text-primary">{{ userSpecificData.user.name }}</p>
-  </th>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].location }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].radius }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].estimate }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.plan_history[0] && userSpecificData.plan_history[0].plan_details">{{ userSpecificData.plan_history[0].plan_details.leads }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.lead_history[0]">{{ userSpecificData.lead_history[0].is_stop }}</span>
-    <span v-else>---</span>
-  </td>
-  <td class="tble_txt">
-    <span v-if="userSpecificData.plan_history[0]">{{ userSpecificData.plan_history[0].date }}</span>
-    <span v-else>---</span>
-  </td>
-</tr>
-       
-</tbody>
-</table>
-      </div>
+<!--  -->
     </div>
     <hr>
     <!-- <div class="more_dtls_div">
@@ -664,65 +460,117 @@ export default {
       const endIndex = startIndex + this.perPage;
       return this.TableData.slice(startIndex, endIndex);
     },
-    planNames() {
-      return this.visibleItems.map((item) => {
-        if (Array.isArray(item.plans) && item.plans.length > 0) {
-          return item.plans[0].name;
-        }
-        return '';
-      });
-    },
+    computedplanNames() {
+    return this.visibleItems.map((item) => {
+      if (Array.isArray(item.plans) && item.plans.length > 0) {
+        return item.plans[0].name;
+      }
+      return '';
+    });
+  },
+    visiblePages() {
+    const maxPages = 7;
+    const pages = [];
+    const startPage = Math.max(1, this.currentPage - Math.floor(maxPages / 2));
+    const endPage = Math.min(this.totalPages, startPage + maxPages - 1);
+
+    for (let page = startPage; page <= endPage; page++) {
+      pages.push(page);
+    }
+
+    return pages;
+  },
   },
   methods: {
     async fetchDataFromApi(pageNumber) {
-      try {
-        const url = `https://api.leadfinder.live/users/users/?page=${pageNumber}`;
-        const response = await axios.get(url);
-        this.TableData = this.TableData.concat(response.data.results);
-        this.totalPages = Math.ceil(response.data.count / this.perPage);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    },
-    async fetchUserSpecificData() {
-      try {
-        if (this.selectedUserId) {
-          const url = `https://api.leadfinder.live/employee/user_info/${this.selectedUserId}/`;
-          const response = await axios.get(url);
-          this.userSpecificData = response.data;
-          // console.log('User Specific Data:', this.userSpecificData);
-        }
-      } catch (error) {
-        console.error('Error fetching user-specific data:', error);
-      }
-    },
-    async fetchPlanDetails(pageNumber) {
   try {
     const url = `https://api.leadfinder.live/users/users/?page=${pageNumber}`;
     const response = await axios.get(url);
-    
-    // Extract the plan names and store them in a separate array
+    this.TableData = this.TableData.concat(response.data.results);
+    this.totalPages = Math.ceil(response.data.count / this.perPage);
     this.planDetailsData = response.data.results;
-    this.planNames = this.planDetailsData.map((user) => {
-      return user.plans[0].name; // Assuming each user has a single plan
-    });
+    this.planNames = this.planDetailsData.map((user) => user.plans[0].name);
   } catch (error) {
-    console.error('Error fetching Plan Details data:', error);
+    console.error('Error fetching data:', error);
   }
 },
 
 
+async fetchUserSpecificData() {
+    try {
+      if (this.selectedUserId) {
+        const url = `https://api.leadfinder.live/employee/user_info/${this.selectedUserId}/`;
+        const response = await axios.get(url);
+        this.userSpecificData = response.data;
 
-    parseDownloadLeadsData() {
-    if (this.userSpecificData.download_leads.length) {
-      const rawData = this.userSpecificData.download_leads[0].data;
-      try {
-        this.parsedDownloadLeadsData = JSON.parse(rawData);
-      } catch (error) {
-        console.error('Error parsing download leads data:', error);
+        if (this.userSpecificData.download_leads && this.userSpecificData.download_leads.length > 0) {
+          const downloadLeadData = this.userSpecificData.download_leads[0].result_table;
+          this.parsedDownloadLeadsData = this.parseResultTable(downloadLeadData);
+          console.log('downloadLead:', this.userSpecificData.download_leads[0]); 
+        }
+
+        if (this.userSpecificData.lead_history) {
+        }
       }
+    } catch (error) {
+      console.error('Error fetching user-specific data:', error);
     }
   },
+  async parseResultTable(resultTableHTML) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(resultTableHTML, 'text/html');
+  const tableRows = doc.querySelectorAll('tbody tr');
+  const parsedData = [];
+
+  tableRows.forEach((row) => {
+    const columns = row.querySelectorAll('td');
+    const rowDataEntry = {
+      No: columns[0].textContent,
+      Name: columns[1].textContent,
+      Phone: columns[2].textContent,
+      Email: columns[3].textContent,
+      Rating: columns[4].textContent,
+      Website: columns[5].textContent,
+      Address: columns[6].textContent,
+      ZipCode: columns[7].textContent,
+    };
+    parsedData.push(rowDataEntry);
+  });
+
+  return parsedData;
+},
+
+    async parseDownloadLeadsData() {
+  if (this.userSpecificData.download_leads && this.userSpecificData.download_leads.length > 0) {
+    const rawData = this.userSpecificData.download_leads[0].data;
+    try {
+      this.parsedDownloadLeadsData = JSON.parse(rawData);
+      if (Array.isArray(this.parsedDownloadLeadsData)) {
+        const firstItem = this.parsedDownloadLeadsData[0];
+        this.TableData = [firstItem]; 
+      }
+    } catch (error) {
+      console.error('Error parsing download leads data:', error);
+      this.parsedDownloadLeadsData = null;
+    }
+  }
+},
+parseData(data) {
+      if (typeof data === 'string') {
+        try {
+          const parsedData = JSON.parse(data);
+          if (Array.isArray(parsedData) && parsedData.length > 0) {
+            return parsedData[0];
+          }
+        } catch (error) {
+          console.error('Error parsing data:', error);
+        }
+      }
+
+      return {};
+    },
+
+
     toggleSidebar() {
       this.$refs.mySidebar.toggle();
     },
@@ -753,17 +601,18 @@ export default {
   },
   created() {
     this.fetchDataFromApi(this.currentPage);
-    this.fetchPlanDetails(1);
+    // this.fetchPlanDetails();
   },
   watch: {
-  sidebarVisible(newVal) {
-    if (newVal) {
-      this.fetchUserSpecificData();
-      this.parseDownloadLeadsData(); 
-    }
+    sidebarVisible(newVal) {
+      if (newVal) {
+        this.fetchUserSpecificData();
+        if (this.userSpecificData && this.userSpecificData.download_leads) {
+          this.parseDownloadLeadsData();
+        }
+      }
+    },
   },
-},
-
 };
 </script>
 

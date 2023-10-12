@@ -722,12 +722,14 @@ margin-right: auto;
 .tble_img{
     height: 30px;
     border-radius: 50px;
+    width: 30px;
 }
 }
 @media screen and (min-width: 768px) {
     .tble_img2{
         height: 45px;
         border-radius: 50px;
+        width: 30px;
     }
     }
 
@@ -807,7 +809,7 @@ th.name_sect {
 th.name_sect2 {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: start;
     cursor: pointer;
 }
 }
@@ -926,6 +928,7 @@ select#table_slct3 {
     .modal_img{
         height: 60px;
         border-radius: 50px;
+        width: 60px;
         /* margin-top: 12px; */
     }
     }
@@ -1200,11 +1203,12 @@ background-color: #0056b3;
 /*  */
 @media screen and (min-width: 768px) {
 .pagination-button {
-background-color: #007BFF; 
+background-color: #007BFF;
 color: #fff;
-padding: 10px 20px; 
-border: none; 
+padding: 5px 15px;
+border: none;
 cursor: pointer;
+margin-bottom: 30px;
 }
 }
 @media screen and (min-width: 768px) {
