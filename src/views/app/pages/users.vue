@@ -195,7 +195,7 @@
       <td class="tble_txt2">{{item.email}}</td>
     <td class="tble_txt2">{{item.phone}}</td>
     <td class="tble_txt2">{{ planNames[index] }}</td>
-    <td class="tble_txt2">{{item.date_joined}}</td>
+    <td class="tble_txt2">{{ formatDateTime(item.date_joined)}}</td>
   </tr>            
 </tbody>
 
@@ -211,6 +211,13 @@
   >{{ page }}</button>
   <button class="pagination-button" @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages">&raquo;</button>
 </div>
+<div class="page-input">
+  <input v-model="pageToGo" type="number" min="1" :max="totalPages" @change="onPageInputChange" />
+  <button @click="goToPage(pageToGo)">Go</button>
+</div>
+
+
+
 
 
 
@@ -302,21 +309,22 @@
       <tbody>
         <tr v-for="(downloadLead, index) in userSpecificData.download_leads" :key="index">
           <th class="name_sect" scope="row">
-            <p class="text-primary">{{ userSpecificData.user.name }}</p>
+            <p class="text-primary">{{ downloadLead.business }}</p>
           </th>
           <td class="tble_txt2">{{ parseData(downloadLead.data).location || 'N/A' }}</td>
-          <td class="tble_txt2">{{ parseData(downloadLead.data).radius || 'N/A' }}</td>
+          <td class="tble_txt2">{{ (parseData(downloadLead.data).radius / 1000) || 'N/A' }} Km</td>
           <td class="tble_txt2">{{ parseData(downloadLead.data).estimate || 'N/A' }}</td>
           <td class="tble_txt2">{{ downloadLead.leads !== undefined ? downloadLead.leads : 'N/A' }}</td>
-          <td class="tble_txt2">{{ parseData(downloadLead.data).is_stop !== undefined ? parseData(downloadLead.data).is_stop : 'N/A' }}</td>
-          <td class="tble_txt2">{{ downloadLead.created_on || 'N/A' }}</td>
+          <td class="tble_txt2">
+          <button v-if="parseData(downloadLead.data).is_stop === 1" type="button" class="btn_won">Yes</button>
+          <span v-else>---</span>
+          </td>
+          <td class="tble_txt2">{{ formatDateTime(downloadLead.created_on) || 'N/A' }}</td>
         </tr>
    </tbody>
     </table>
   </div>
-
     </div>
-
     <div>
         <div class="txt_main_one">
             <h5>Lead History (Tap)</h5>
@@ -342,19 +350,22 @@
 </tr>
 <tr v-for="(lead, index) in userSpecificData.lead_history" :key="index">
   <th class="name_sect" scope="row">
-    <p class="text-primary">{{ userSpecificData.user.name }}</p>
+    <p class="text-primary">{{ lead.business }}</p>
   </th>
   <td class="tble_txt2">{{ lead.location || '---' }}</td>
-  <td class="tble_txt2">{{ lead.radius || '---' }}</td>
+  <td class="tble_txt2">{{ (lead.radius / 1000) || '---' }} Km</td>
   <td class="tble_txt2">{{ lead.estimate || '---' }}</td>
-  <td class="tble_txt2">{{ lead.leads !== undefined ? lead.leads : 'N/A' }}</td>
-  <td class="tble_txt2">{{ lead.is_stop || '---' }}</td>
-  <td class="tble_txt2">{{ lead.created_on || '---' }}</td>
+  <td class="tble_txt2">{{ lead.results !== undefined ? lead.results   : 'N/A' }}</td>
+  <td class="tble_txt2">
+  <button v-if="lead.is_stop" type="button" class="btn_won">Yes</button>
+  <span v-else>---</span>
+  </td>
+  <td class="tble_txt2">{{ formatDateTime(lead.created_on) || '---' }}</td>
 </tr>
 
-      </tbody>
-    </table>
-  </div>
+</tbody>
+</table>
+</div>
 
 <!--  -->
     </div>
@@ -406,7 +417,7 @@
     <div class="bottom_icons2">
         <div class="icon_cover2">
             <svg width="1em" height="1em" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon--container_WX8MsF4aQZ5i3RN1  card-icon_d2zbHgAjG6G91rwP "><path opacity="0.01" fill="#fff" fill-opacity="0.2" d="M1 1h20v20H1z"></path><path opacity="0.01" fill="#A9A9EB" d="M1 1h20v20H1z"></path><rect x="1.313" y="3.465" width="19.375" height="17.222" rx="2" fill="#fff" stroke="#6E49B8" stroke-linecap="round" stroke-linejoin="round"></rect><path d="M1.313 5.465a2 2 0 0 1 2-2h15.374a2 2 0 0 1 2 2v2.844H1.313V5.465Z" fill="#B4A3D6" stroke="#6E49B8" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15.306 1.313v4.305M6.694 1.313v4.305" stroke="#6E49B8" stroke-linecap="round" stroke-linejoin="round"></path></svg>        </div>
-        <div>No upcoming meetings with Laura Norda. <br>
+        <div>No upcoming meetings with {{selectedItem.name}} <br>
             <b class="text-info">Add meeting</b>
         </div>
     </div>
@@ -414,7 +425,7 @@
     <div class="bottom_icons2">
         <div class="icon_cover">
             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 22 15" fill="none" class="icon--container_WX8MsF4aQZ5i3RN1  card-icon_d2zbHgAjG6G91rwP "><path fill-rule="evenodd" clip-rule="evenodd" d="M1.313 2.75a2 2 0 0 1 2-2h15.374a2 2 0 0 1 2 2v8.799a2 2 0 0 1-2 2H3.313a2 2 0 0 1-2-2V2.75Z" fill="#FDDBB5" stroke="#E86F25" stroke-linecap="round" stroke-linejoin="round"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M1.313 2.54a.9.9 0 0 1 1.478-.69L11 8.749l8.209-6.897a.9.9 0 0 1 1.479.689v8.867a2 2 0 0 1-2 2H3.313a2 2 0 0 1-2-2V2.54Z" fill="#fff" stroke="#E86F25" stroke-linecap="round" stroke-linejoin="round"></path></svg>        </div>
-        <b class="text-dark">Laura Norda sent an email
+        <b class="text-dark">{{selectedItem.name}} sent an email
             <p>5 Days ago</p>
         </b>
     </div>
@@ -422,7 +433,7 @@
     <div class="bottom_icons2">
         <div class="icon_cover3">
             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 21 21" fill="none" class="icon--container_WX8MsF4aQZ5i3RN1  card-icon_d2zbHgAjG6G91rwP "><circle cx="10.236" cy="10.764" r="9.236" fill="#fff" stroke="#2895A4" stroke-linecap="round" stroke-linejoin="round"></circle><circle cx="10.236" cy="10.764" fill="#ABECF5" stroke="#2895A4" stroke-linecap="round" stroke-linejoin="round" r="5.278"></circle><circle cx="10.236" cy="10.764" fill="#fff" r="1.319"></circle><path d="M10.236 10.764 18.1 2.9M18.1 1v1.9H20" stroke="#2895A4" stroke-linecap="round" stroke-linejoin="round"></path></svg>        </div>
-        <p class="text-dark">Laura Norda is not part of any sales sequence.</p>
+        <p class="text-dark">{{selectedItem.name}} is not part of any sales sequence.</p>
     </div>
    </div>
 </b-sidebar>
@@ -432,43 +443,43 @@
 
 <script>
 import axios from 'axios';
-
 export default {
-  data() {
-    return {
-      current_btn: 'btn0',
-      currentPage: 1,
-      perPage: 20,
-      displayedItems: [],
-      sidebarVisible: false,
-      selectedItem: null,
-      TableData: [],
-      totalPages: 8000,
-      selectedUserId: null,
-      userSpecificData: {},
-      parsedDownloadLeadsData: null,
-      planDetailsData: [], 
-      planNames: [],
-    };
-  },
-  computed: {
-    totalRows() {
-      return this.TableData.length;
-    },
-    visibleItems() {
-      const startIndex = (this.currentPage - 1) * this.perPage;
-      const endIndex = startIndex + this.perPage;
-      return this.TableData.slice(startIndex, endIndex);
-    },
-    computedplanNames() {
-    return this.visibleItems.map((item) => {
-      if (Array.isArray(item.plans) && item.plans.length > 0) {
-        return item.plans[0].name;
-      }
-      return '';
-    });
-  },
-    visiblePages() {
+data() {
+  return {
+    current_btn: 'btn0',
+    currentPage: 1,
+    perPage: 20,
+    displayedItems: [],
+    sidebarVisible: false,
+    selectedItem: null,
+    TableData: [],
+    totalPages: '',
+    selectedUserId: null,
+    userSpecificData: {},
+    parsedDownloadLeadsData: null,
+    planDetailsData: [],
+    planNames: [],
+    pageToGo: 1,
+  };
+},
+computed: {
+totalRows() {
+  return this.TableData.length;
+},
+visibleItems() {
+  const startIndex = (this.currentPage - 1) * this.perPage;
+  const endIndex = startIndex + this.perPage;
+  return this.TableData.slice(startIndex, endIndex);
+},
+computedplanNames() {
+  return this.visibleItems.map((item) => {
+    if (Array.isArray(item.plans) && item.plans.length > 0) {
+      return item.plans[0].name;
+    }
+    return '';
+  });
+},
+visiblePages() {
     const maxPages = 7;
     const pages = [];
     const startPage = Math.max(1, this.currentPage - Math.floor(maxPages / 2));
@@ -480,9 +491,9 @@ export default {
 
     return pages;
   },
-  },
-  methods: {
-    async fetchDataFromApi(pageNumber) {
+},
+methods: {
+async fetchDataFromApi(pageNumber) {
   try {
     const url = `https://api.leadfinder.live/users/users/?page=${pageNumber}`;
     const response = await axios.get(url);
@@ -495,28 +506,29 @@ export default {
   }
 },
 
-
 async fetchUserSpecificData() {
-    try {
-      if (this.selectedUserId) {
-        const url = `https://api.leadfinder.live/employee/user_info/${this.selectedUserId}/`;
-        const response = await axios.get(url);
-        this.userSpecificData = response.data;
+  try {
+    if (this.selectedUserId) {
+      const url = `https://api.leadfinder.live/employee/user_info/${this.selectedUserId}/`;
+      const response = await axios.get(url);
+      this.userSpecificData = response.data;
 
-        if (this.userSpecificData.download_leads && this.userSpecificData.download_leads.length > 0) {
-          const downloadLeadData = this.userSpecificData.download_leads[0].result_table;
-          this.parsedDownloadLeadsData = this.parseResultTable(downloadLeadData);
-          console.log('downloadLead:', this.userSpecificData.download_leads[0]); 
-        }
-
-        if (this.userSpecificData.lead_history) {
-        }
+      if (this.userSpecificData.download_leads && this.userSpecificData.download_leads.length > 0) {
+        const downloadLeadData = this.userSpecificData.download_leads[0].result_table;
+        this.parsedDownloadLeadsData = this.parseResultTable(downloadLeadData);
+        console.log('downloadLead:', this.userSpecificData.download_leads[0]);
       }
-    } catch (error) {
-      console.error('Error fetching user-specific data:', error);
+
+      if (this.userSpecificData.lead_history) {
+        this.parseLeadHistoryData(this.userSpecificData.lead_history);
+      }
     }
-  },
-  async parseResultTable(resultTableHTML) {
+  } catch (error) {
+    console.error('Error fetching user-specific data:', error);
+  }
+},
+
+async parseResultTable(resultTableHTML) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(resultTableHTML, 'text/html');
   const tableRows = doc.querySelectorAll('tbody tr');
@@ -540,14 +552,14 @@ async fetchUserSpecificData() {
   return parsedData;
 },
 
-    async parseDownloadLeadsData() {
+async parseDownloadLeadsData() {
   if (this.userSpecificData.download_leads && this.userSpecificData.download_leads.length > 0) {
     const rawData = this.userSpecificData.download_leads[0].data;
     try {
       this.parsedDownloadLeadsData = JSON.parse(rawData);
       if (Array.isArray(this.parsedDownloadLeadsData)) {
         const firstItem = this.parsedDownloadLeadsData[0];
-        this.TableData = [firstItem]; 
+        this.TableData = [firstItem];
       }
     } catch (error) {
       console.error('Error parsing download leads data:', error);
@@ -555,69 +567,103 @@ async fetchUserSpecificData() {
     }
   }
 },
+
 parseData(data) {
-      if (typeof data === 'string') {
-        try {
-          const parsedData = JSON.parse(data);
-          if (Array.isArray(parsedData) && parsedData.length > 0) {
-            return parsedData[0];
-          }
-        } catch (error) {
-          console.error('Error parsing data:', error);
-        }
+  if (typeof data === 'string') {
+    try {
+      const parsedData = JSON.parse(data);
+      if (Array.isArray(parsedData) && parsedData.length > 0) {
+        return parsedData[0];
       }
+    } catch (error) {
+      console.error('Error parsing data:', error);
+    }
+  }
 
-      return {};
-    },
+  return {};
+},
 
+formatDateTime(dateTime) {
+  if (!dateTime) return '---'; 
 
-    toggleSidebar() {
-      this.$refs.mySidebar.toggle();
-    },
-    setCurrentBtn(btn) {
-      this.current_btn = btn;
-    },
-    onPageChange(newPage) {
-      if (newPage >= 1 && newPage <= this.totalPages) {
-        this.currentPage = newPage;
-        this.fetchDataFromApi(newPage);
-      }
-    },
-    showDetails(item) {
-      this.selectedItem = item;
-      this.sidebarVisible = true;
-      this.selectedUserId = item.id;
+  const date = new Date(dateTime);
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); 
+  const day = date.getDate().toString().padStart(2, '0');
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
 
-      this.$nextTick(async () => {
-        await this.fetchUserSpecificData();
-      });
-    },
-    goToPage(page) {
-      if (page >= 1 && page <= this.totalPages) {
-        this.currentPage = page;
-        this.fetchDataFromApi(page);
-      }
-    },
+  
+  const formattedHours = hours % 12 || 12; 
+  const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
+  const formattedDateTime = `${year}-${month}-${day} ${formattedHours}:${formattedMinutes} ${ampm}`;
+
+  return formattedDateTime;
+},
+
+parseLeadHistoryData(leadHistory) {
+  // Your lead history parsing logic here
+},
+
+toggleSidebar() {
+  this.$refs.mySidebar.toggle();
+},
+
+setCurrentBtn(btn) {
+  this.current_btn = btn;
+},
+
+onPageChange(newPage) {
+  if (newPage >= 1 && newPage <= this.totalPages) {
+    this.currentPage = newPage;
+    this.fetchDataFromApi(newPage);
+  }
+},
+onPageInputChange() {
+    // Parse the input value to ensure it's a number
+    this.pageToGo = parseInt(this.pageToGo);
+
+    // Ensure that the pageToGo is within valid page numbers
+    this.pageToGo = Math.min(this.pageToGo, this.totalPages);
+    this.pageToGo = Math.max(this.pageToGo, 1);
   },
-  created() {
-    this.fetchDataFromApi(this.currentPage);
-    // this.fetchPlanDetails();
+
+showDetails(item) {
+  this.selectedItem = item;
+  this.sidebarVisible = true;
+  this.selectedUserId = item.id;
+  this.$nextTick(async () => {
+    await this.fetchUserSpecificData();
+  });
+},
+
+goToPage(page) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.fetchDataFromApi(page);
+    }
   },
-  watch: {
-    sidebarVisible(newVal) {
-      if (newVal) {
-        this.fetchUserSpecificData();
-        if (this.userSpecificData && this.userSpecificData.download_leads) {
-          this.parseDownloadLeadsData();
-        }
+  },
+
+created() {
+  this.fetchDataFromApi(this.currentPage);
+  // this.fetchPlanDetails();
+},
+
+watch: {
+  sidebarVisible(newVal) {
+    if (newVal) {
+      // this.fetchUserSpecificData();
+      if (this.userSpecificData && this.userSpecificData.download_leads) {
+        this.parseDownloadLeadsData();
       }
-    },
+    }
   },
-};
+},
+};    
 </script>
-
-
-
 
 
 

@@ -178,8 +178,8 @@
           </div>
       </div>
       <!--  -->
-      <div class="table-responsive">
-          <table class="table  table-hover table-bordered table-responsive">
+      <div class="table-responsive_main">
+          <table class="table1  table-hover table-bordered">
 <thead>
   <tr>
     <th class="tble_name_sect" scope="col"> <input class="inptchck" type="checkbox"> Name <select name="" id="table_slct"></select></th>
@@ -403,7 +403,7 @@ export default {
             status: 'Lost', 
             account: 'Techcave (sample)' 
         },
-        {   name: 'Jay Patel (sample)',
+        {   name: 'Jay Patel',
             image: '/dashboard/prof_pic_dashbrd3.png',
             email: 'jaypatelsample@gmail.com', 
             work: '+ Click to Add', 
