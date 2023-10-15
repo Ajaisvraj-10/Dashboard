@@ -188,40 +188,34 @@
   </tr>
 </thead>
 <tbody>
-    <tr v-for="(item, index) in visibleItems" :key="index" @click="showDetails(item)">
-      <th class="name_sect2" scope="row"><input class="inptchck_user" type="checkbox">
-      <img class="tble_img" :src="item.image || '/dashboard/prof_pic_dashbrd.png'" alt=""><p class="text-primary">{{item.name}}</p>
-      </th>
-      <td class="tble_txt2">{{item.email}}</td>
-    <td class="tble_txt2">{{item.phone}}</td>
-    <td class="tble_txt2">{{ planNames[index] }}</td>
-    <td class="tble_txt2">{{ formatDateTime(item.date_joined)}}</td>
-  </tr>            
+  <tr v-for="(item, index) in allData" :key="index" @click="showDetails(item)">
+          <th class="name_sect2" scope="row">
+            <input class="inptchck_user" type="checkbox">
+            <img class="tble_img" :src="item.image || '/dashboard/prof_pic_dashbrd.png'" alt="">
+            <p class="text-primary">{{ item.name }}</p>
+          </th>
+          <td class="tble_txt2">{{ item.email }}</td>
+          <td class="tble_txt2">{{ item.phone }}</td>
+          <td class="tble_txt2">{{ planName }}</td>
+          <td class="tble_txt2">{{ formatDateTime(item.date_joined) }}</td>
+        </tr>  
 </tbody>
 
 </table>
 <div class="custom-pagination">
-  <button class="pagination-button" @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">&laquo;</button>
-  <button
-    v-for="page in visiblePages"
-    :key="page"
-    @click="goToPage(page)"
-    :class="{ active: currentPage === page }"
-    class="pagination-button"
-  >{{ page }}</button>
-  <button class="pagination-button" @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages">&raquo;</button>
-</div>
-<div class="page-input">
-  <input v-model="pageToGo" type="number" min="1" :max="totalPages" @change="onPageInputChange" />
-  <button @click="goToPage(pageToGo)">Go</button>
-</div>
+  <button class="pagination-button" @click="goToFirstPage" :disabled="currentPage === 1">First</button>
+      <button class="pagination-button" @click="setPage(currentPage - 1)" :disabled="currentPage === 1">&laquo; Previous</button>
+      <button
+        v-for="page in calculatedPages"
+        :key="page"
+        @click="setPage(page)"
+        :class="{ active: currentPage === page }"
+        class="pagination-button"
+      >{{ page }}</button>
+      <button class="pagination-button" @click="setPage(currentPage + 1)" :disabled="currentPage === totalPages">Next &raquo;</button>
+      <button class="pagination-button" @click="goToLastPage" :disabled="currentPage === totalPages">Last</button>
 
-
-
-
-
-
-
+    </div>
 </div>
      
       <b-sidebar v-model="sidebarVisible"   id="sidebar-1" right shadow>
@@ -280,10 +274,10 @@
       </thead>
       <tbody>
   <tr>
-    <td class="text-info">{{ planDetailsData.length > 0 ? planDetailsData[0].plans[0].name : 'N/A' }}</td>
-    <td class="text-info">{{ planDetailsData.length > 0 ? planDetailsData[0].plans[0].amount : 'N/A' }}</td>
-    <td class="text-info">{{ planDetailsData.length > 0 ? planDetailsData[0].plans[0].date : 'N/A' }}</td>
-  </tr>
+  <td class="text-info">{{ planName }}</td>
+  <td class="text-info">{{ planAmount }}</td>
+  <td class="text-info">{{ planCreatedDate }}</td>
+</tr>
 </tbody>
 
 </table >
@@ -448,63 +442,79 @@ data() {
   return {
     current_btn: 'btn0',
     currentPage: 1,
-    perPage: 20,
+    itemsperPage: 20,
     displayedItems: [],
     sidebarVisible: false,
     selectedItem: null,
     TableData: [],
-    totalPages: '',
     selectedUserId: null,
     userSpecificData: {},
     parsedDownloadLeadsData: null,
-    planDetailsData: [],
     planNames: [],
-    pageToGo: 1,
+    totalPages:415,
+    allData: [],
   };
 },
+
 computed: {
-totalRows() {
-  return this.TableData.length;
-},
-visibleItems() {
-  const startIndex = (this.currentPage - 1) * this.perPage;
-  const endIndex = startIndex + this.perPage;
-  return this.TableData.slice(startIndex, endIndex);
-},
-computedplanNames() {
-  return this.visibleItems.map((item) => {
-    if (Array.isArray(item.plans) && item.plans.length > 0) {
-      return item.plans[0].name;
+  planName() {
+    if (this.allData.length > 0 && this.allData[0].plans.length > 0) {
+      return this.allData[0].plans[0].name;
     }
-    return '';
-  });
-},
-visiblePages() {
-    const maxPages = 7;
-    const pages = [];
-    const startPage = Math.max(1, this.currentPage - Math.floor(maxPages / 2));
-    const endPage = Math.min(this.totalPages, startPage + maxPages - 1);
-
-    for (let page = startPage; page <= endPage; page++) {
-      pages.push(page);
-    }
-
-    return pages;
+    return 'N/A';
   },
+  planAmount() {
+    if (this.allData.length > 0 && this.allData[0].plans.length > 0) {
+      return this.allData[0].plans[0].amount;
+    }
+    return 'N/A';
+  },
+  planCreatedDate() {
+    if (this.allData.length > 0 && this.allData[0].plans.length > 0) {
+      return this.allData[0].plans[0].date;
+    }
+    return 'N/A';
+  },
+
+  calculatedPages() {
+    const maxButtons = 7;
+    const totalPages = this.totalPages;
+    const middle = Math.floor(maxButtons / 2);
+    let start = Math.max(1, this.currentPage - middle);
+    let end = Math.min(start + maxButtons - 1, totalPages);
+    const remainingButtons = maxButtons - (end - start + 1);
+
+    if (remainingButtons > 0 && start === 1) {
+      end = Math.min(end + remainingButtons, totalPages);
+    } else if (remainingButtons > 0 && end === totalPages) {
+      start = Math.max(start - remainingButtons, 1);
+    }
+
+    return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+  },
+
+
+    
+totalPages() {
+  return Math.ceil(this.allData.length / this.itemsperPage);
 },
+
+},
+
 methods: {
-async fetchDataFromApi(pageNumber) {
+  async fetchDataFromApi(pageNumber) {
   try {
     const url = `https://api.leadfinder.live/users/users/?page=${pageNumber}`;
     const response = await axios.get(url);
-    this.TableData = this.TableData.concat(response.data.results);
-    this.totalPages = Math.ceil(response.data.count / this.perPage);
-    this.planDetailsData = response.data.results;
-    this.planNames = this.planDetailsData.map((user) => user.plans[0].name);
+    const responseData = response.data.results;
+    this.allData = responseData;
+
   } catch (error) {
     console.error('Error fetching data:', error);
   }
 },
+
+
 
 async fetchUserSpecificData() {
   try {
@@ -527,6 +537,7 @@ async fetchUserSpecificData() {
     console.error('Error fetching user-specific data:', error);
   }
 },
+
 
 async parseResultTable(resultTableHTML) {
   const parser = new DOMParser();
@@ -552,6 +563,7 @@ async parseResultTable(resultTableHTML) {
   return parsedData;
 },
 
+
 async parseDownloadLeadsData() {
   if (this.userSpecificData.download_leads && this.userSpecificData.download_leads.length > 0) {
     const rawData = this.userSpecificData.download_leads[0].data;
@@ -568,6 +580,7 @@ async parseDownloadLeadsData() {
   }
 },
 
+
 parseData(data) {
   if (typeof data === 'string') {
     try {
@@ -579,9 +592,9 @@ parseData(data) {
       console.error('Error parsing data:', error);
     }
   }
-
   return {};
 },
+
 
 formatDateTime(dateTime) {
   if (!dateTime) return '---'; 
@@ -593,27 +606,26 @@ formatDateTime(dateTime) {
   const hours = date.getHours();
   const minutes = date.getMinutes();
   const ampm = hours >= 12 ? 'PM' : 'AM';
-
-  
   const formattedHours = hours % 12 || 12; 
   const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-
   const formattedDateTime = `${year}-${month}-${day} ${formattedHours}:${formattedMinutes} ${ampm}`;
-
   return formattedDateTime;
 },
 
+
 parseLeadHistoryData(leadHistory) {
-  // Your lead history parsing logic here
 },
+
 
 toggleSidebar() {
   this.$refs.mySidebar.toggle();
 },
 
+
 setCurrentBtn(btn) {
   this.current_btn = btn;
 },
+
 
 onPageChange(newPage) {
   if (newPage >= 1 && newPage <= this.totalPages) {
@@ -621,14 +633,7 @@ onPageChange(newPage) {
     this.fetchDataFromApi(newPage);
   }
 },
-onPageInputChange() {
-    // Parse the input value to ensure it's a number
-    this.pageToGo = parseInt(this.pageToGo);
 
-    // Ensure that the pageToGo is within valid page numbers
-    this.pageToGo = Math.min(this.pageToGo, this.totalPages);
-    this.pageToGo = Math.max(this.pageToGo, 1);
-  },
 
 showDetails(item) {
   this.selectedItem = item;
@@ -639,13 +644,25 @@ showDetails(item) {
   });
 },
 
-goToPage(page) {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.fetchDataFromApi(page);
-    }
+setPage(page) {
+if (page >= 1 && page <= this.totalPages) {
+  if (page === this.totalPages) {
+    this.currentPage = this.totalPages;
+  } else {
+    this.currentPage = page;
+    this.fetchDataFromApi(page); 
+  }
+}
+},
+goToLastPage() {
+    this.currentPage = this.totalPages;
+    this.fetchDataFromApi(this.currentPage);
   },
+  goToFirstPage() {
+    this.currentPage = 1;
+    this.fetchDataFromApi(this.currentPage);
   },
+},
 
 created() {
   this.fetchDataFromApi(this.currentPage);
