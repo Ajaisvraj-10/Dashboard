@@ -196,7 +196,7 @@
           </th>
           <td class="tble_txt2">{{ item.email }}</td>
           <td class="tble_txt2">{{ item.phone }}</td>
-          <td class="tble_txt2">{{ planName }}</td>
+          <td class="tble_txt2">{{ item.plans[0].name }}</td>
           <td class="tble_txt2">{{ formatDateTime(item.date_joined) }}</td>
         </tr>  
 </tbody>
@@ -273,11 +273,11 @@
         </tr>
       </thead>
       <tbody>
-  <tr>
-  <td class="text-info">{{ planName }}</td>
-  <td class="text-info">{{ planAmount }}</td>
-  <td class="text-info">{{ planCreatedDate }}</td>
-</tr>
+        <tr v-for="(plan, index) in planHistory" :key="index">
+      <td class="text-info">{{ plan.plan_details.plan }}</td>
+      <td class="text-info">{{ plan.plan_details.amount }}</td>
+      <td class="text-info">{{ formatDateTime(plan.plan_details.created_on) }}</td>
+    </tr>
 </tbody>
 
 </table >
@@ -297,7 +297,7 @@
           <th class="tble_txt3" scope="col">Estimation</th>
           <th class="tble_txt3" scope="col">Leads</th>
           <th class="tble_txt3" scope="col">Is Stopped</th>
-          <th class="tble_txt3" scope="col">Date & Time</th>
+          <th class="tble_txt3_dt" scope="col">Date & Time</th>
         </tr>
       </thead>
       <tbody>
@@ -333,7 +333,7 @@
           <th class="tble_txt3" scope="col">Estimation</th>
           <th class="tble_txt3" scope="col">Leads</th>
           <th class="tble_txt3" scope="col">Is Stopped</th>
-          <th class="tble_txt3" scope="col">Date & Time</th>
+          <th class="tble_txt3_dt" scope="col">Date & Time</th>
         </tr>
       </thead>
       <tbody>
@@ -453,6 +453,7 @@ data() {
     planNames: [],
     totalPages:415,
     allData: [],
+    planHistory: [],
   };
 },
 
@@ -522,6 +523,7 @@ async fetchUserSpecificData() {
       const url = `https://api.leadfinder.live/employee/user_info/${this.selectedUserId}/`;
       const response = await axios.get(url);
       this.userSpecificData = response.data;
+      this.planHistory = response.data.plan_history;
 
       if (this.userSpecificData.download_leads && this.userSpecificData.download_leads.length > 0) {
         const downloadLeadData = this.userSpecificData.download_leads[0].result_table;
@@ -666,7 +668,7 @@ goToLastPage() {
 
 created() {
   this.fetchDataFromApi(this.currentPage);
-  // this.fetchPlanDetails();
+  this.fetchPlanHistoryData
 },
 
 watch: {

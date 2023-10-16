@@ -71,6 +71,10 @@
         flex-direction: row;
         align-items: center;
         }
+        .hedr_box1:hover{
+            border: 1px solid #007efc;
+        }
+        
         }
         
         
@@ -838,6 +842,12 @@ th.tble_txt3 {
     padding: 2px 20px;
     text-align: center;
 }
+th.tble_txt3_dt{
+    font-size: 13px;
+    width: 14%;
+    padding: 2px 50px;
+    text-align: center;
+}
 th.tble_txt2 {
     font-size: 13px;
     width: 19%;
@@ -1025,7 +1035,7 @@ height: 20px;
 
 @media screen and (min-width: 768px) {
 div#sidebar-1 {
-width: 70% !important;
+width: 73% !important;
 background: #fff !important;
 }
 }
