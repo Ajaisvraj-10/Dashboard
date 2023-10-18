@@ -74,8 +74,19 @@
         <div class="scnd_thrd_wrap">
             <div class="scndry_navbar">
           <div class="inptdiv">
-              <svg class="serch_img" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><path fill-opacity=".01" fill="#FFF" opacity=".01" d="M1 1h14v14H1z"></path><g stroke="#000"><path stroke-linecap="round" d="M9.733 9.733L14.5 14.5"></path><path d="M11.033 6.267a4.767 4.767 0 1 1-9.533 0 4.767 4.767 0 0 1 9.533 0z"></path></g></g></svg>
-              <input type="text" placeholder="Search your CRM...">
+              <svg  class="serch_img" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><path fill-opacity=".01" fill="#FFF" opacity=".01" d="M1 1h14v14H1z"></path><g stroke="#000"><path stroke-linecap="round" d="M9.733 9.733L14.5 14.5"></path><path d="M11.033 6.267a4.767 4.767 0 1 1-9.533 0 4.767 4.767 0 0 1 9.533 0z"></path></g></g></svg>
+              <input v-model="searchQuery"  type="text" placeholder="Search your CRM..."> <button @click="performSearch">Search</button>
+              <!-- <div class="popup" v-if="showSearchResults">
+                <div class="popup-content">
+      <h2 class="popup-title">Search Results</h2>
+      <ul class="popup-list">
+        <li v-for="(result, index) in searchResults" :key="index" class="popup-item">
+          <a class="search_name" @click="showDetails(result)">{{ result.name }}</a>
+        </li>
+      </ul>
+      <button @click="closePopup" class="popup-close-button">Close</button>
+    </div>
+    </div> -->
           </div>
           <div class="inner_navbar">
               <div class="inner_txt">Your trial ends in 14 days
@@ -188,33 +199,28 @@
   </tr>
 </thead>
 <tbody>
-  <tr v-for="(item, index) in allData" :key="index" @click="showDetails(item)">
-          <th class="name_sect2" scope="row">
-            <input class="inptchck_user" type="checkbox">
-            <img class="tble_img" :src="item.image || '/dashboard/prof_pic_dashbrd.png'" alt="">
-            <p class="text-primary">{{ item.name }}</p>
-          </th>
-          <td class="tble_txt2">{{ item.email }}</td>
-          <td class="tble_txt2">{{ item.phone }}</td>
-          <td class="tble_txt2">{{ item.plans[0].name }}</td>
-          <td class="tble_txt2">{{ formatDateTime(item.date_joined) }}</td>
-        </tr>  
+  <tr v-for="(item, index) in filteredData" :key="index" @click="showDetails(item)">
+  <th class="name_sect2" scope="row">
+    <input class="inptchck_user" type="checkbox">
+    <img class="tble_img" :src="item.image || '/dashboard/prof_pic_dashbrd.png'" alt="">
+    <p class="text-primary">{{ item.name }}</p>
+  </th>
+  <td class="tble_txt2">{{ item.email }}</td>
+  <td class="tble_txt2">{{ item.phone }}</td>
+  <td class="tble_txt2">{{ item.plans[0].name }}</td>
+  <td class="tble_txt2">{{ formatDateTime(item.date_joined) }}</td>
+</tr>
+
+
 </tbody>
 
 </table>
 <div class="custom-pagination">
-  <button class="pagination-button" @click="goToFirstPage" :disabled="currentPage === 1">First</button>
+      <button class="pagination-button" @click="goToFirstPage" :disabled="currentPage === 1">First</button>
       <button class="pagination-button" @click="setPage(currentPage - 1)" :disabled="currentPage === 1">&laquo; Previous</button>
-      <button
-        v-for="page in calculatedPages"
-        :key="page"
-        @click="setPage(page)"
-        :class="{ active: currentPage === page }"
-        class="pagination-button"
-      >{{ page }}</button>
+      <button v-for="page in calculatedPages" :key="page" @click="setPage(page)" :class="{ active: currentPage === page }" class="pagination-button">{{ page }}</button>
       <button class="pagination-button" @click="setPage(currentPage + 1)" :disabled="currentPage === totalPages">Next &raquo;</button>
       <button class="pagination-button" @click="goToLastPage" :disabled="currentPage === totalPages">Last</button>
-
     </div>
 </div>
      
@@ -451,9 +457,14 @@ data() {
     userSpecificData: {},
     parsedDownloadLeadsData: null,
     planNames: [],
-    totalPages:415,
+    totalPages:418,
     allData: [],
     planHistory: [],
+    searchQuery: '',
+    filteredData: [],
+    searchResults: [],
+    showSearchResults: false,
+    pageNumber: 1,
   };
 },
 
@@ -476,70 +487,98 @@ computed: {
     }
     return 'N/A';
   },
-
   calculatedPages() {
-    const maxButtons = 7;
-    const totalPages = this.totalPages;
-    const middle = Math.floor(maxButtons / 2);
-    let start = Math.max(1, this.currentPage - middle);
-    let end = Math.min(start + maxButtons - 1, totalPages);
-    const remainingButtons = maxButtons - (end - start + 1);
+  const maxButtons = 7;
+  const totalPages = this.totalPages;
 
-    if (remainingButtons > 0 && start === 1) {
-      end = Math.min(end + remainingButtons, totalPages);
-    } else if (remainingButtons > 0 && end === totalPages) {
-      start = Math.max(start - remainingButtons, 1);
-    }
+  let start = Math.max(1, this.currentPage - Math.floor(maxButtons / 2));
+  let end = Math.min(start + maxButtons - 1, totalPages);
 
-    return Array.from({ length: end - start + 1 }, (_, index) => start + index);
-  },
+  if (end - start < maxButtons - 1) {
+    start = Math.max(1, start - (maxButtons - 1 - (end - start)));
+  }
 
-
-    
-totalPages() {
-  return Math.ceil(this.allData.length / this.itemsperPage);
+  return Array.from({ length: end - start + 1 }, (_, index) => start + index);
 },
 
+
+
+totalNumberOfPages() {
+    return Math.ceil(this.totalResultsCount / this.itemsPerPage);
+  },
 },
 
 methods: {
   async fetchDataFromApi(pageNumber) {
   try {
-    const url = `https://api.leadfinder.live/users/users/?page=${pageNumber}`;
+    const url = `https://api.leadfinder.live/users/users/?page=${pageNumber}${this.searchQuery ? `&search=${this.searchQuery}` : ''}`;
     const response = await axios.get(url);
     const responseData = response.data.results;
     this.allData = responseData;
-
+    this.filteredData = responseData;
+    this.itemsperPage = responseData.length; 
+    this.totalResultsCount = response.data.count;
   } catch (error) {
     console.error('Error fetching data:', error);
   }
 },
 
 
-
-async fetchUserSpecificData() {
+async performSearch() {
   try {
-    if (this.selectedUserId) {
-      const url = `https://api.leadfinder.live/employee/user_info/${this.selectedUserId}/`;
-      const response = await axios.get(url);
-      this.userSpecificData = response.data;
-      this.planHistory = response.data.plan_history;
-
-      if (this.userSpecificData.download_leads && this.userSpecificData.download_leads.length > 0) {
-        const downloadLeadData = this.userSpecificData.download_leads[0].result_table;
-        this.parsedDownloadLeadsData = this.parseResultTable(downloadLeadData);
-        console.log('downloadLead:', this.userSpecificData.download_leads[0]);
-      }
-
-      if (this.userSpecificData.lead_history) {
-        this.parseLeadHistoryData(this.userSpecificData.lead_history);
-      }
-    }
+    const url = `https://api.leadfinder.live/users/users/?page=${this.pageNumber}&search=${this.searchQuery}`;
+    const response = await axios.get(url);
+    const responseData = response.data.results;
+    this.filteredData = responseData;
+    this.totalResultsCount = response.data.count;
+    this.totalPages = Math.ceil(this.totalResultsCount / this.itemsperPage);
+    console.log('Filtered Data:', this.filteredData);
   } catch (error) {
-    console.error('Error fetching user-specific data:', error);
+    console.error('Error fetching data:', error);
   }
 },
 
+
+  async search() {
+  try {
+    const query = this.searchQuery.trim().toLowerCase();
+    if (query === '') {
+      this.filteredData = this.allData;
+    } else {
+      const allData = await this.fetchAndFilterData(query);
+      this.filteredData = allData;
+      this.totalResultsCount = allData.length;
+    }
+    this.currentPage = 1;
+    this.totalPages = Math.ceil(this.totalResultsCount / this.itemsperPage);
+  } catch (error) {
+    console.error('Error searching:', error);
+  }
+},
+
+
+
+async fetchUserSpecificData() {
+try {
+if (this.selectedUserId) {
+  const url = `https://api.leadfinder.live/employee/user_info/${this.selectedUserId}/`;
+  const response = await axios.get(url);
+  this.userSpecificData = response.data;
+  this.planHistory = response.data.plan_history;
+
+  if (this.userSpecificData.download_leads && this.userSpecificData.download_leads.length > 0) {
+    const downloadLeadData = this.userSpecificData.download_leads[0].result_table;
+    this.parsedDownloadLeadsData = this.parseResultTable(downloadLeadData);
+    console.log('downloadLead:', this.userSpecificData.download_leads[0]);
+  }
+  if (this.userSpecificData.lead_history) {
+    this.parseLeadHistoryData(this.userSpecificData.lead_history);
+  }
+}
+} catch (error) {
+console.error('Error fetching user-specific data:', error);
+}
+},
 
 async parseResultTable(resultTableHTML) {
   const parser = new DOMParser();
@@ -669,6 +708,7 @@ goToLastPage() {
 created() {
   this.fetchDataFromApi(this.currentPage);
   this.fetchPlanHistoryData
+  // this.search();
 },
 
 watch: {
@@ -680,6 +720,16 @@ watch: {
       }
     }
   },
+  searchQuery(newValue) {
+    if (!newValue) {
+      this.filteredData = this.allData; 
+      this.currentPage = 1; 
+    } else {
+      this.performSearch(); 
+    }
+  },
+  
+  
 },
 };    
 </script>
